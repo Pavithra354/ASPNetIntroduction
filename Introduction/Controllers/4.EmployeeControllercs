@@ -1,0 +1,95 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace Introduction.Controllers.Employees_4
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class EmployeeV4Controller : ControllerBase
+    {
+        private static List<Employee> _dbstore = new List<Employee>()
+        {
+            new Employee(){ EmpId = 1 , EmpName = "John" , EmpLocation = "UK" , EmpAddress = "Xyz"},
+            new Employee(){ EmpId = 2 , EmpName = "Peter" , EmpLocation = "US" , EmpAddress = "Abc"},
+            new Employee(){ EmpId = 3 , EmpName = "Sam" , EmpLocation = "India" , EmpAddress = "Def"}
+        };
+
+        /// <summary>
+        /// PUT: Update full employee record by ID
+        /// Example: PUT http://localhost:5108/api/EmployeeV4/updateEmployee/1
+        /// </summary>
+        [HttpPut("updateEmployee/{id}")]
+        public async Task<IActionResult> UpdateEmployee([FromRoute] int id, [FromBody] EmployeeDTO empDto)
+        {
+            await Task.Delay(1000);
+            var employee = _dbstore.FirstOrDefault(x => x.EmpId == id);
+            if (employee == null) return NotFound("Employee not found.");
+
+            employee.EmpName = empDto.Name ?? employee.EmpName;
+            employee.EmpLocation = empDto.Location ?? employee.EmpLocation;
+            employee.EmpAddress = empDto.Address ?? employee.EmpAddress;
+
+            return Ok($"Record updated successfully for {employee.EmpName}.");
+        }
+
+        /// <summary>
+        /// PATCH: Update partial employee data by ID
+        /// Example: PATCH http://localhost:5108/api/EmployeeV4/updateEmployeePartial/1
+        /// </summary>
+        [HttpPatch("updateEmployeePartial/{id}")]
+        public async Task<IActionResult> UpdateEmployeePartial([FromRoute] int id, [FromBody] EmployeeDTO empDto)
+        {
+            await Task.Delay(1000);
+            var employee = _dbstore.FirstOrDefault(x => x.EmpId == id);
+            if (employee == null) return NotFound("Employee not found.");
+
+            if (!string.IsNullOrWhiteSpace(empDto.Name)) employee.EmpName = empDto.Name;
+            if (!string.IsNullOrWhiteSpace(empDto.Location)) employee.EmpLocation = empDto.Location;
+            if (!string.IsNullOrWhiteSpace(empDto.Address)) employee.EmpAddress = empDto.Address;
+
+            return Ok($"Record partially updated for {employee.EmpName}.");
+        }
+
+        /// <summary>
+        /// DELETE: Remove employee by ID
+        /// Example: DELETE http://localhost:5108/api/EmployeeV4/deleteEmployee/1
+        /// </summary>
+        [HttpDelete("deleteEmployee/{id}")]
+        public async Task<IActionResult> DeleteEmployee([FromRoute] int id)
+        {
+            await Task.Delay(1000);
+            var employee = _dbstore.FirstOrDefault(x => x.EmpId == id);
+            if (employee == null) return NotFound("Employee not found.");
+
+            _dbstore.Remove(employee);
+            return Ok($"Employee {employee.EmpName} deleted successfully.");
+        }
+
+        /// <summary>
+        /// GET: Retrieve all employees
+        /// Example: GET http://localhost:5108/api/EmployeeV4/getAllEmployees
+        /// </summary>
+        [HttpGet("getAllEmployees")]
+        public async Task<IActionResult> GetAllEmployees()
+        {
+            await Task.Delay(500);
+            return Ok(_dbstore);
+        }
+    }
+
+    // DTO for requests
+    public class EmployeeDTO
+    {
+        public string Name { get; set; }
+        public string? Location { get; set; }
+        public string? Address { get; set; }
+    }
+
+    // Model for in-memory storage
+    public class Employee
+    {
+        public int EmpId { get; set; }
+        public string EmpName { get; set; }
+        public string EmpLocation { get; set; }
+        public string EmpAddress { get; set; }
+    }
+}
