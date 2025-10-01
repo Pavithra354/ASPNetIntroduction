@@ -1,37 +1,57 @@
+using Introduction;
+using Introduction.Extensions;
+using Introduction.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
+// Add services to the container.
+
 builder.Services.AddControllers();
 
-// Enable CORS for Angular (http://localhost:4200)
-builder.Services.AddCors(cors =>
+builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
+
+
+
+
+builder.Services.AddCors((cors) =>
 {
     cors.AddPolicy("AllowLocalhost4200", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy.
+        WithOrigins("http://localhost:4200").
+        AllowAnyHeader().
+        AllowAnyMethod();
     });
 });
 
-// Add Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//http://localhost:4200
+
+//https://localhost:7115/api/Employees/GetEmpName
 
 var app = builder.Build();
 
-// Use CORS
+// Configure the HTTP request pipeline.
+
+
 app.UseCors("AllowLocalhost4200");
 
-// Enable Swagger
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    c.RoutePrefix = string.Empty; // Swagger available at root
-});
+
+//'afadafsdfadfasdsfdasdasdasd';
+
+
+//Multiple middlewares in future
+//app.UseMiddleware<HTTPContextMiddleware>();
+//logging
+//excption
+//autthenication
+//app.UseHttpContextDemo();
+//app.UseLoggingContextDemo();
+
+
+//app.UseAuthentictionDemo();
 
 app.UseHttpsRedirection();
+
 app.UseAuthorization();
 
 app.MapControllers();
